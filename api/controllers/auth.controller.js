@@ -1,13 +1,13 @@
-import bcryptjs from "bcryptjs";
+import bcrypt from "bcryptjs";  
 import User from "../models/user.model.js";
 import { generetTokenAndSetCookie } from "../utils/generetToken.js";
 
 // signup controller to handle user registration
 export const signup = async (req, res) => {
-  try {
-    // destructure the request body
-    const { username, email, password } = req.body;
+  // destructure the request body
+  const { username, email, password } = req.body;
 
+  try {
     // check if all fields are provided
     if (
       !username ||
@@ -17,44 +17,46 @@ export const signup = async (req, res) => {
       email === "" ||
       password === ""
     ) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({
+        success: false, 
+        message: "All fields are required" });
     }
 
     // check if username is valid
     if (username.length < 3 || username.length > 20) {
       return res
         .status(400)
-        .json({ message: "Username must be between 3 and 20 characters long" });
+        .json({success: false,  message: "Username must be between 3 and 20 characters long" });
     }
 
     // check if username aleardy exists
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
-      return res.status(400).json({ message: "Username is aleardy taken" });
+      return res.status(400).json({success: false,  message: "Username is aleardy taken" });
     }
 
     // check if email is valid
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // email validation regex
     // check email format
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
+      return res.status(400).json({success: false,  message: "Invalid email format" });
     }
 
     // check if email aleardy exists
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
-      return res.status(400).json({ message: "Email is already taken" });
+      return res.status(400).json({success: false,  message: "Email is already taken" });
     }
 
     // check if password is valid
     if (password.length < 6) {
       return res
         .status(400)
-        .json({ message: "Password must be at least 6 charecter long" });
+        .json({success: false,  message: "Password must be at least 6 charecter long" });
     }
 
     // hash the password
-    const hashedPassword = await bcryptjs.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // create a new user instance
     const newUser = new User({
@@ -72,6 +74,7 @@ export const signup = async (req, res) => {
 
       // respond with success message
       return res.status(201).json({
+        success: true,
         message: "Signup successful",
         data: userData,
       });
@@ -79,42 +82,43 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "Invalid creadentials" });
     }
   } catch (err) {
+    // log the error and respond with internal server error
     console.error("error during signup: ", err.message);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 // signin controller to handle user login
 export const signin = async (req, res) => {
+  // destructure the request body
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
-
     // check if all fields are provided
     if (!email || !password || email === "" || password === "") {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({success: false,  message: "All fields are required" });
     }
 
     // check if email is valid
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // email validation regex
     // check email format{
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
+      return res.status(400).json({ success: false,  message: "Invalid email format" });
     }
 
     // check if user exists
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({success: false,  message: "User not found" });
     }
 
     // compare provided password with stored hashed password
-    const isPasswordValid = await bcryptjs.compare(
+    const isPasswordValid = await bcrypt.compare(
       password,
       existingUser.password
     );
     // check if password is valid
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(400).json({success: false,  message: "Invalid password" });
     }
 
     // generate token and set cookie
@@ -125,12 +129,82 @@ export const signin = async (req, res) => {
 
     // responde with succcess message ans user data
     res.status(200).json({
+      success: true,
       message: "Singin Successfull",
       data: userData,
     });
   } catch (err) {
+    // log the error and respond with internal server error
     console.errror("error during signin: ", err.message);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
+// googleAuth auth controller to handle user registration or login via google
+export const googleAuth = async (req, res) => {
+  // destructure the request body
+  const { name, email, googlePhotoUrl } = req.body;
+  try {
+    // check if user exists
+    const user = await User.findOne({ email });
+
+    // if user exists: generate token, set cookie and respond with user data
+    if (user) {
+      // generate token and set cookie
+      generetTokenAndSetCookie(user._id, user.isAdmin, res);
+
+      // exclude password from respose
+      const { password, ...userData } = user._doc;
+
+      // respond with success message and user data
+      return res.status(200).json({
+        success: true,
+        message: "Google auth successful ",
+        data: userData,
+      });
+    }
+    // if user not exist: create new user
+    else {
+      // generate random password
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+
+      // hash the password
+      const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+      // modify username to be unique
+      const username =
+        name.toLowerCase().replace(/\s+/g, "") +
+        Math.floor(Math.random() * 1000);
+
+      // create new user instance
+      const newUser = new User({
+        username,
+        email,
+        password: hashedPassword,
+        profilePicture: googlePhotoUrl,
+      });
+
+      // save the new user
+      await newUser.save();
+
+      // generate token and set cookie
+      generetTokenAndSetCookie(newUser._id, newUser.isAdmin, res);
+
+      // exclude password from response
+      const { password, ...userData } = newUser._doc;
+
+      // respond with success message and user data
+      res.status(201).json({
+        success: true,
+        message: "Google auth successful",
+        data: userData,
+      });
+    }
+  } catch (error) {
+    // log the error and respond with internal server error
+    console.error("error during google auth: ", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
