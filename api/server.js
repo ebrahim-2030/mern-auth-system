@@ -1,6 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
+
+// import the database connection function
 import {connectToDB} from "./config/db.js";
+// import user auth routes
+import authRoutes from './routes/user.route.js';   
 
 // load environment variables from .env file
 dotenv.config();
@@ -18,6 +22,9 @@ connectToDB();
 app.get('/', (req, res) => {
     res.send("Server is ready!");
 });
+
+// user auth routes
+app.use("/api/auth", authRoutes);
 
 // use environment port or default to 3000
 const PORT = process.env.PORT || 3000;
