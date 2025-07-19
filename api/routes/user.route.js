@@ -1,5 +1,6 @@
 import express from "express";
-import { signup, signin, googleAuth, signout } from "../controllers/auth.controller.js";
+import { signup, signin, googleAuth, signout, getMe } from "../controllers/auth.controller.js";
+import { verifyToken } from "../middlewares/verfyToken.js";
 
 const router = express.Router();
 
@@ -14,6 +15,9 @@ router.post("/google", googleAuth);
 
 // signout route to handle user logout
 router.post("/signout", signout);
+
+// auth check route to get current user data
+router.get("/me",verifyToken, getMe);
 
 
 export default router;

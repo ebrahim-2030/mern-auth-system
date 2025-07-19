@@ -25,12 +25,10 @@ export const signup = async (req, res) => {
 
     // check if username is valid
     if (username.length < 3 || username.length > 20) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Username must be between 3 and 20 characters long",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Username must be between 3 and 20 characters long",
+      });
     }
 
     // check if username aleardy exists
@@ -60,12 +58,10 @@ export const signup = async (req, res) => {
 
     // check if password is valid
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Password must be at least 6 charecter long",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 charecter long",
+      });
     }
 
     // hash the password
@@ -252,3 +248,11 @@ export const signout = async (req, res) => {
   }
 };
 
+// getMe controller to handle user auth check
+export const getMe =  (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "User authenticated successfully",
+    data: req.user, // user data is attached to req by the auth middleware
+  });
+};
