@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 // import the database connection function
 import {connectToDB} from "./config/db.js";
@@ -12,8 +13,11 @@ dotenv.config();
 // create an instance of express
 const app = express();
 
-// middleware to parsing json
+// middleware to parsing json requests
 app.use(express.json());
+
+// meddleware to parse cookies
+app.use(cookieParser());
 
 // connect to the database
 connectToDB();
