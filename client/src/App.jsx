@@ -4,11 +4,14 @@ import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
 import Profile from "./pages/Profile";
+import Navbar from "./components/Navbar";
 
 const App = () => {
   return (
     // wrap the app in Router to enaple routing
     <Router>
+      {/* import the Navbar component */}
+      <Navbar />
       {/* define the routes for application */}
       <Routes>
         <Route path={"/"} element={<Home />} />
