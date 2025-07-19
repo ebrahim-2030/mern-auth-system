@@ -1,7 +1,22 @@
 
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import Home from "./pages/Home";
+import Signup from "./pages/Signup";
+import Signin from "./pages/Signin";
+import Profile from "./pages/Profile";
+
 const App = () => {
   return (
-    <div>MERM Auth System</div>
+    // wrap the app in Router to enaple routing
+    <Router>
+      {/* define the routes for application */}
+      <Routes>
+        <Route path={"/"} element={<Home />} />
+        <Route path={"/sigup"} element={<Signup />} />
+        <Route path={"/signin"} element={<Signin />} />
+        <Route path={"/profile"} element={<Profile />} />
+      </Routes>
+    </Router>
   )
 }
 
