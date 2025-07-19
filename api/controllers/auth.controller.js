@@ -1,9 +1,10 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import { generetTokenAndSetCookie } from "../utils/generetToken.js";
+import { errorHandler } from "../utils/error.js";
 
 // signup controller to handle user registration
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
   // destructure the request body
   const { username, email, password } = req.body;
 
@@ -17,51 +18,40 @@ export const signup = async (req, res) => {
       email === "" ||
       password === ""
     ) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
+      return next(errorHandler(400, "All fields are required"));
     }
 
     // check if username is valid
     if (username.length < 3 || username.length > 20) {
-      return res.status(400).json({
-        success: false,
-        message: "Username must be between 3 and 20 characters long",
-      });
+      return next(
+        errorHandler(400, "Username must be between 3 and 20 characters")
+      );
     }
 
     // check if username aleardy exists
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Username is aleardy taken" });
+      return next(errorHandler(400, "Username is aleardy taken"));
     }
 
     // check if email is valid
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // email validation regex
     // check email format
     if (!emailRegex.test(email)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid email format" });
+      return next(errorHandler(400, "Invalid email format"));
     }
 
     // check if email aleardy exists
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email is already taken" });
+      return next(errorHandler(400, "Email is already taken"));
     }
 
     // check if password is valid
     if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 6 charecter long",
-      });
+      return next(
+        errorHandler(400, "Password must be at least 6 characters long")
+      );
     }
 
     // hash the password
@@ -88,42 +78,39 @@ export const signup = async (req, res) => {
         data: userData,
       });
     } else {
-      return res.status(400).json({ message: "Invalid creadentials" });
+      return next(errorHandler(400, "Failed to create user"));
     }
   } catch (err) {
-    // log the error and respond with internal server error
-    console.error("error during signup: ", err.message);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    // log the error
+    console.error("ERROR DURRING SIGNUP: ", err.message);
+    // pass the error to the error handler middleware
+    next(err);
   }
 };
 
 // signin controller to handle user login
-export const signin = async (req, res) => {
+export const signin = async (req, res, next) => {
   // destructure the request body
   const { email, password } = req.body;
   try {
     // check if all fields are provided
     if (!email || !password || email === "" || password === "") {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields are required" });
+      return next(errorHandler(400, "All fields are required"));
     }
 
     // check if email is valid
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // email validation regex
     // check email format{
     if (!emailRegex.test(email)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid email format" });
+            return next(errorHandler(400, "Invalid email format"));
+
     }
 
     // check if user exists
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return next(errorHandler(400, "User not found"));
+      
     }
 
     // compare provided password with stored hashed password
@@ -133,9 +120,8 @@ export const signin = async (req, res) => {
     );
     // check if password is valid
     if (!isPasswordValid) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid password" });
+      return next(errorHandler(400, "Invalid password"));
+      
     }
 
     // generate token and set cookie
@@ -151,14 +137,15 @@ export const signin = async (req, res) => {
       data: userData,
     });
   } catch (err) {
-    // log the error and respond with internal server error
-    console.errror("error during signin: ", err.message);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    // log the error
+    console.error("ERROR DURING SIGNIN: ", err.message);
+    // pass the error to the error handler middleware
+    next(err);
   }
 };
 
 // googleAuth auth controller to handle user registration or login via google
-export const googleAuth = async (req, res) => {
+export const googleAuth = async (req, res, next) => {
   // destructure the request body
   const { name, email, googlePhotoUrl } = req.body;
   try {
@@ -219,15 +206,17 @@ export const googleAuth = async (req, res) => {
         data: userData,
       });
     }
-  } catch (error) {
-    // log the error and respond with internal server error
-    console.error("error during google auth: ", error.message);
-    res.status(500).json({ success: false, message: "Internal server error" });
+  } catch (err) {
+    // log the err
+    console.error("ERROR DURING GOOGLE AUTH: ", err.message);
+
+    // pass the error to the error handler middleware
+    next(err);
   }
 };
 
 // signout controller to handle user logout
-export const signout = async (req, res) => {
+export const signout = async (req, res, next) => {
   try {
     // clear the access token cookie
     res.clearCookie("access_token", {
@@ -242,14 +231,16 @@ export const signout = async (req, res) => {
       message: "Signout successfull",
     });
   } catch (err) {
-    // log the error and respond with internal server error
-    console.error("Error during signout: ", err.message);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    // log the error
+    console.error("ERROR DURING SIGNOUT: ", err.message);
+    //
+    // pass the error to the error handler middleware
+    next(err);
   }
 };
 
 // getMe controller to handle user auth check
-export const getMe =  (req, res) => {
+export const getMe = (req, res) => {
   res.status(200).json({
     success: true,
     message: "User authenticated successfully",

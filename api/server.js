@@ -1,11 +1,11 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
+import express from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 // import the database connection function
-import {connectToDB} from "./config/db.js";
+import { connectToDB } from "./config/db.js";
 // import user auth routes
-import authRoutes from './routes/user.route.js';   
+import authRoutes from "./routes/user.route.js";
 
 // load environment variables from .env file
 dotenv.config();
@@ -23,8 +23,8 @@ app.use(cookieParser());
 connectToDB();
 
 // defaul route
-app.get('/', (req, res) => {
-    res.send("Server is ready!");
+app.get("/", (req, res) => {
+  res.send("Server is ready!");
 });
 
 // user auth routes
@@ -35,6 +35,16 @@ const PORT = process.env.PORT || 3000;
 
 // start the server
 app.listen(PORT, () => {
-    console.log(`SERVER IS RUNNING ON PORT ${PORT}`);
-}); 
+  console.log(`SERVER IS RUNNING ON PORT ${PORT}`);
+});
 
+// error handler middleware to handle errors
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal server error";
+  res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message,
+  });
+});
