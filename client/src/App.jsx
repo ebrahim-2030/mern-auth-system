@@ -15,7 +15,7 @@ const App = () => {
       {/* define the routes for application */}
       <Routes>
         <Route path={"/"} element={<Home />} />
-        <Route path={"/sigup"} element={<Signup />} />
+        <Route path={"/signup"} element={<Signup />} />
         <Route path={"/signin"} element={<Signin />} />
         <Route path={"/profile"} element={<Profile />} />
       </Routes>
