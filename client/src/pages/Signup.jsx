@@ -46,23 +46,20 @@ const Signup = () => {
         if (err.response.status === 400) {
           // input validation error
           setError(err.response.data.message);
-        } else if (err.response.status === 500) {
+        } else if (err.response.status >= 500) {
           // server error
-          setError("Our server is having a moment. Please try again.");
+          setError("Server Error, Please try again letter.");
         } else {
-          // unexpected errors
-          setError("Oops! Something went wrong. Please try again.");
+          // upexpected errors
+          setError("Something went wrong!");
         }
       } else {
-        // Network or other error
+        // network or other error
         setError("Network Error, Please check your connection.");
       }
 
       // log error for debuggin
-      // console.error(
-      //   "SIGNUP ERROR:",
-      //   err.response?.data?.message || err.message
-      // );
+      console.error("SIGNUP ERROR:", err);
     } finally {
       // stop loading regarless of result
       setLoading(false);
