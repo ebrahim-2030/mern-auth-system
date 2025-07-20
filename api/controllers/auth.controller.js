@@ -102,15 +102,13 @@ export const signin = async (req, res, next) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // email validation regex
     // check email format{
     if (!emailRegex.test(email)) {
-            return next(errorHandler(400, "Invalid email format"));
-
+      return next(errorHandler(400, "Invalid email format"));
     }
 
     // check if user exists
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
-      return next(errorHandler(400, "User not found"));
-      
+      return next(errorHandler(404, "User not found"));
     }
 
     // compare provided password with stored hashed password
@@ -121,7 +119,6 @@ export const signin = async (req, res, next) => {
     // check if password is valid
     if (!isPasswordValid) {
       return next(errorHandler(400, "Invalid password"));
-      
     }
 
     // generate token and set cookie

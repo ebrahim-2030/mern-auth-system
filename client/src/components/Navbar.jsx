@@ -13,21 +13,12 @@ const Navbar = () => {
             Auth
           </h1>
         </Link>
-        <div className="flex items-center gap-2 text-sm text-zinc-500">
-          <button
-            onClick={() => navigate("/signin")}
-            className=" font-medium cursor-pointer"
-          >
-            Login
-          </button>
-          <span className="font-black text-teal-500 opacity-50">|</span>
-          <button
-            onClick={() => navigate("/signup")}
-            className=" font-medium cursor-pointer "
-          >
-            Register
-          </button>
-        </div>
+        <button
+          onClick={() => navigate("/signup")}
+          className=" font-medium cursor-pointer bg-teal-500 text-white px-6 rounded py-1"
+        >
+          Register
+        </button>
       </div>
     </nav>
   );
