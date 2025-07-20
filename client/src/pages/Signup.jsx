@@ -70,7 +70,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="h-screen flex justify-center pt-32 sm:pt-0 text-zinc-600 ">
+    <div className="h-screen bg-gradient-to-t from-teal-100 flex justify-center pt-32 sm:pt-0 text-zinc-600 ">
       <div className="sm:flex sm:justify-center sm:items-center gap-10 lg:gap-16 xl:gap-20">
         {/* welcome text section */}
         <div className="flex flex-col items-center text-center gap-3">
