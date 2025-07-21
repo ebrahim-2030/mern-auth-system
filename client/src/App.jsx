@@ -30,7 +30,8 @@ const App = () => {
             <Route element={<AdminRoute />}>
               <Route path={"/dashboard"} element={<Dashboard />} />
             </Route>
-            <Route path="/not-found" element={<NotFound />} />
+            <Route path="not-found" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
       </div>

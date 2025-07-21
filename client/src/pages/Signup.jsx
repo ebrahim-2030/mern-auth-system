@@ -118,7 +118,7 @@ const Signup = () => {
               type="password"
               id="password"
               name="password"
-              placeholder="Password"
+              placeholder="••••••••"
               onChange={handleChange}
             />
 
