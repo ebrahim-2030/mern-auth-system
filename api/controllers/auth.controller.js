@@ -176,7 +176,7 @@ export const googleAuth = async (req, res, next) => {
 
       // modify username to be unique
       const username =
-        name.toLowerCase().replace(/\s+/g, "") +
+        name.split(" ")[0].toLowerCase().replace(/\s+/g, "") +
         Math.floor(Math.random() * 1000);
 
       // create new user instance

@@ -14,7 +14,13 @@ export const fetchCurrentUser = createAsyncThunk(
         err.response?.status === 401 &&
         err.response?.data?.message === "Unauthorized: No token provided"
       ) {
-        return null; // no error, no user
+        return null;
+      }
+      if (
+        err.response?.status === 404 &&
+        err.response?.data?.message === "User not found"
+      ) {
+        return null;
       }
       return thunkAPI.rejectWithValue(err.response?.data?.message);
     }
@@ -76,7 +82,7 @@ const authSlice = createSlice({
         ) {
           state.user = null;
           state.loading = false;
-          state.error = null; 
+          state.error = null;
         } else {
           // for other errors, show error message
           state.user = null;

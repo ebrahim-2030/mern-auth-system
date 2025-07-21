@@ -58,14 +58,18 @@ const Navbar = () => {
         <div>
           {user ? (
             <div className="relative flex items-center">
-              <div
-                ref={dropdownRef}
-                onClick={() => setDropdown(!dropdown)}
-                className="h-11 w-11 rounded-full overflow-hidden cursor-pointer bg-teal-500 text-white flex justify-center items-center"
-              >
-                <span className="text-xl font-bold  capitalize">
-                  {user.username.charAt(0)}
-                </span>
+              <div ref={dropdownRef} onClick={() => setDropdown(!dropdown)}>
+                {user?.profilePicture ? (
+                  <div className="h-11 w-11 rounded-full overflow-hidden cursor-pointer">
+                    <img src={user.profilePicture} alt="" />
+                  </div>
+                ) : (
+                  <div className="h-11 w-11 rounded-full overflow-hidden cursor-pointer bg-teal-500 text-white flex justify-center items-center">
+                    <span className="text-xl font-bold  capitalize">
+                      {user.username.charAt(0)}
+                    </span>
+                  </div>
+                )}
               </div>
               <ul
                 className={`absolute top-1/2 -translate-y-1/2 right-10  rounded flex  gap-2   ${

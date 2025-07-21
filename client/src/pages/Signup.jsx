@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FaHandsClapping } from "react-icons/fa6";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import OAuth from "../components/OAuth";
 
 const Signup = () => {
   // state to hold form input values
@@ -38,9 +39,18 @@ const Signup = () => {
 
       // send signup request to the backend
       const res = await axios.post("/api/auth/signup", formData);
+      if (res.status === 201) {
+        // redirect to signin page
+        navigate("/signin");
+
+        // clear form
+        setFormData({});
+      } else {
+        // signin failure
+        dispatch(signinFailure(res.data.message));
+      }
 
       // redirect to signin page
-      navigate("/signin");
     } catch (err) {
       if (err.response) {
         if (err.response.status === 400) {
@@ -57,7 +67,6 @@ const Signup = () => {
         // network or other error
         setError("Network Error, Please check your connection.");
       }
-
     } finally {
       // stop loading regarless of result
       setLoading(false);
@@ -121,6 +130,7 @@ const Signup = () => {
             >
               {loading ? "Signup . . ." : "Signup"}
             </button>
+            <OAuth />
           </form>
 
           {/* error message */}

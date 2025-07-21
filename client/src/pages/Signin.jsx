@@ -6,9 +6,9 @@ import {
   signinStart,
   signinSuccess,
   signinFailure,
-  
 } from "../features/authSlice.js";
 import { useDispatch, useSelector } from "react-redux";
+import OAuth from "../components/OAuth.jsx";
 
 const Signin = () => {
   // state to hold form input values
@@ -40,20 +40,21 @@ const Signin = () => {
 
       // send signin request to the backend
       const res = await axios.post("/api/auth/signin", formData);
+      const data = res.data.data;
 
       if (res.status === 200) {
         // signin success
-        dispatch(signinSuccess(res.data.data));
+        dispatch(signinSuccess(data));
+        
+        // clear form
+        setFormData({});
+
+        // redirect to home page
+        navigate("/");
       } else {
         // signin failure
         dispatch(signinFailure(res.data.message));
       }
-
-      // clear form data
-      setFormData({});
-
-      // redirect to home page
-      navigate("/");
     } catch (err) {
       if (err.response) {
         // input validation check user existing error
@@ -107,6 +108,7 @@ const Signin = () => {
           >
             {loading ? "Signin . . ." : "Signin"}
           </button>
+          <OAuth />
         </form>
 
         {/* error message */}
