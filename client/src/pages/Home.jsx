@@ -1,12 +1,15 @@
+import { use } from "react";
 import { BiHappyHeartEyes } from "react-icons/bi";
+import { useSelector } from "react-redux";
 
 const Home = () => {
+  const { user } = useSelector((state) => state.auth);
   return (
     <div className="h-screen flex items-center justify-center text-zinc-600">
       <div className="flex flex-col items-center text-center gap-3">
         <BiHappyHeartEyes size={90} className="text-teal-500" />
         <h2 className="text-2xl font-medium bg-teal-500  text-white px-2">
-          Hey, <span className="">Developer!</span>
+          Hi, <span className="capitalize">{user ? user.username : "developer"}</span>
         </h2>
         <p className="text-3xl font-bold  ">Welcome to our app</p>
         <p className="text-zinc-500">

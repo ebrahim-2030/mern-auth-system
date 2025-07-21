@@ -2,18 +2,22 @@ import axios from "axios";
 import { useState } from "react";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import {
+  signinStart,
+  signinSuccess,
+  signinFailure,
+  
+} from "../features/authSlice.js";
+import { useDispatch, useSelector } from "react-redux";
 
 const Signin = () => {
   // state to hold form input values
   const [formData, setFormData] = useState({});
 
-  // state to display error message
-  const [error, setError] = useState(null);
-
-  // state to manage loading during api call
-  const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
+
+  const { error, loading } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   // handle input field changes
   const handleChange = (e) => {
@@ -26,16 +30,27 @@ const Signin = () => {
 
     // check if all fields are profided
     if (!formData.email || !formData.password) {
-      return setError("All fields are required!");
+      dispatch(signinFailure("All filds are required!"));
+      return;
     }
 
     try {
       // start loading and clear error
-      setLoading(true);
-      setError(null);
+      dispatch(signinStart());
 
       // send signin request to the backend
       const res = await axios.post("/api/auth/signin", formData);
+
+      if (res.status === 200) {
+        // signin success
+        dispatch(signinSuccess(res.data.data));
+      } else {
+        // signin failure
+        dispatch(signinFailure(res.data.message));
+      }
+
+      // clear form data
+      setFormData({});
 
       // redirect to home page
       navigate("/");
@@ -43,22 +58,17 @@ const Signin = () => {
       if (err.response) {
         // input validation check user existing error
         if (err.response.status === 400 || err.response.status === 404) {
-          setError(err.response.data.message);
+          dispatch(signinFailure(err.response.data.message));
         } else if (err.response.status >= 500) {
           // server error
-          setError("Server Error, Please try again letter.");
+          dispatch(signinFailure("Server Error, Please try again letter."));
         } else {
           // upexpected errors
-          setError("Something went wrong!");
+          dispatch(signinFailure("Something went wrong!"));
         }
       } else {
-        setError("Network Error, Please check your connection.");
+        dispatch(signinFailure("Network Error!, Please try again letter."));
       }
-      // // log error for debuggin
-      // console.error("SIGNIN ERROR:", err);
-    } finally {
-      // stop loading regarless of result
-      setLoading(false);
     }
   };
 
@@ -86,7 +96,7 @@ const Signin = () => {
             type="password"
             id="password"
             name="password"
-            placeholder="Password"
+            placeholder="••••••••••"
             onChange={handleChange}
           />
 

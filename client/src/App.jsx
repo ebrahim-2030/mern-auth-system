@@ -1,11 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
 import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
+import { useEffect } from "react";
+import { fetchCurrentUser } from "./features/authSlice";
 
 const App = () => {
+  // get the dispatch function
+  const dispatch = useDispatch ();
+
+  // dispatch the fetchCurrentUser action
+  useEffect(() => {
+    dispatch(fetchCurrentUser())
+  }, [dispatch])
   return (
     <div className="bg-zinc-100">
       <Router>

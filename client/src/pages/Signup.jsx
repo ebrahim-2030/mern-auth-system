@@ -58,8 +58,6 @@ const Signup = () => {
         setError("Network Error, Please check your connection.");
       }
 
-      // log error for debuggin
-      console.error("SIGNUP ERROR:", err);
     } finally {
       // stop loading regarless of result
       setLoading(false);
