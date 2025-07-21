@@ -1,17 +1,19 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { signout } from "../features/authSlice.js";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
 import { TiUser } from "react-icons/ti";
 import { IoMdLogOut } from "react-icons/io";
+import { MdDashboardCustomize } from "react-icons/md";
+
 const Navbar = () => {
   const navigate = useNavigate();
   const [dropdown, setDropdown] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const dropdownRef = useState(null);
+  const dropdownRef = useRef(null);
 
   // handle dropdown
   const dropdownHandler = (e) => {
@@ -42,14 +44,16 @@ const Navbar = () => {
   return (
     <nav className="h-[8vh] sm:h-[9.5vh] text-zinc-600 fixed inset-0 z-50">
       <div className="h-full  max-w-7xl mx-auto flex justify-between items-center px-4 ">
-        <Link to={"/"}>
-          <h1 className="text-2xl font-black italic font-mono text-teal-500">
-            <span className="font-sans opacity-50">
-              /<span className="opacity-50">/</span>/
-            </span>
-            Auth
-          </h1>
-        </Link>
+        <div>
+          <Link to={"/"}>
+            <h1 className="text-2xl font-black italic font-mono text-teal-500">
+              <span className="font-sans opacity-50">
+                /<span className="opacity-50">/</span>/
+              </span>
+              Auth
+            </h1>
+          </Link>
+        </div>
 
         <div>
           {user ? (
@@ -59,7 +63,7 @@ const Navbar = () => {
                 onClick={() => setDropdown(!dropdown)}
                 className="h-11 w-11 rounded-full overflow-hidden cursor-pointer bg-teal-500 text-white flex justify-center items-center"
               >
-                <span className="text-xl  capitalize">
+                <span className="text-xl font-bold  capitalize">
                   {user.username.charAt(0)}
                 </span>
               </div>
@@ -85,6 +89,15 @@ const Navbar = () => {
                   <TiUser />
                   <span>Profile</span>
                 </Link>
+                {user?.isAdmin && (
+                  <Link
+                    to={"/dashboard"}
+                    className="flex items-center gap-1 hover:text-teal-500"
+                  >
+                    <MdDashboardCustomize />
+                    <span>Dashboard</span>
+                  </Link>
+                )}
               </ul>
             </div>
           ) : (
